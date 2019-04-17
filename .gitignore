@@ -1,0 +1,5 @@
+*.pyc
+.DS_Store
+config/.cached_metadata.pickle
+config/core/install_location.yml
+config/core/pipeline_configuration.yml

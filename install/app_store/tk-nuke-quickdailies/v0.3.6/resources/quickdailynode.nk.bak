@@ -1,0 +1,761 @@
+set cut_paste_input [stack 0]
+version 11.0 v3
+push $cut_paste_input
+Group {
+ name ShotgunQuickDaily2
+ tile_color 0xffbf00ff
+ label "v3.3.08 MDS Edition"
+ note_font Verdana
+ selected true
+ xpos -318
+ ypos 466
+ mapsize {0.15 0.15}
+ addUserKnob {20 tanktab l "Shotgun Quick Daily"}
+ addUserKnob {6 font_colour_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ font_colour_panelDropped true
+ addUserKnob {26 version l "" +STARTLINE T "Shotgun Quick Daily Tool v3.3.08 - MDS Edition"}
+ addUserKnob {26 ""}
+ addUserKnob {26 burninDescription l "" +STARTLINE T "INSTRUCTIONS\nPlease select the type of burnin your require. \n\nShot - Uses our standard font size and film gate.\nAsset - Uses a smaller font size and no gate.\n\nFor Comp review please deliver dailies in Cineon colour space. \n"}
+ addUserKnob {26 ""}
+ addUserKnob {26 burninType l "" +STARTLINE T SETUP}
+ addUserKnob {19 font_colour l "Font Colour" t "Select the font colour."}
+ font_colour {1 1 1 1}
+ addUserKnob {6 font_colour_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 font_colour_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 burninOption l "Burnin Option" M {Shot Asset ""}}
+ addUserKnob {4 gateBlur l "Gate Blur" M {On Off ""}}
+ addUserKnob {4 format l Format M {"half 2K DCP ( 1024 x 540 )" "2K DCP ( 2048 x 1080 )" "720P ( 1280 x 720 )" "1080P (1920 x 1080 )" "" "" "" "" ""}}
+ format "2K DCP ( 2048 x 1080 )"
+ addUserKnob {4 colourspace l Colourspace t "sRGB  -  normal picture viewing\nCineon - Extended range for Comp Review\nHSV - Diagnostic colourspace" M {sRGB Cineon HSV "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {26 Audio l "" +STARTLINE T AUDIO}
+ addUserKnob {41 mov32_audiofile l "audio file" T mov_writer.mov32_audiofile}
+ addUserKnob {41 mov32_audio_offset l "audio offset" T mov_writer.mov32_audio_offset}
+ addUserKnob {26 ""}
+ addUserKnob {26 ""}
+ addUserKnob {22 doit l "Create Quick Daily" T "# have to gracefully support the case when \n# Sgtk is not in the system at all or when \n# running an incompatible version of Sgtk.\nimport nuke\n\ntry:\n  app = nuke.tk_nuke_quickdailies\n  fn = app.create_daily_v1\nexcept Exception, e:\n  nuke.warning(\"Could not render Shotgun Quickdaily! Most likely Sgtk is not currently active. Message: %s\" % e)\nelse:\n  fn(nuke.thisNode())\n\n" +STARTLINE}
+ addUserKnob {26 ButonDescription l "" +STARTLINE T "\nClicking the above button will:\n\n1. Set your project resolution\n1. Render a quicktime\n2. Place it in the correct location on disk\n3. Send it to Shotgun ready for review"}
+ addUserKnob {26 ""}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x71c67100
+  label COLOURSPACE
+  note_font_size 42
+  xpos 113
+  ypos -2881
+  bdwidth 422
+  bdheight 482
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x8e8e3800
+  label "BURNIN - GATE"
+  note_font_size 42
+  xpos -588
+  ypos -1899
+  bdwidth 1151
+  bdheight 727
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x388e8e00
+  label FORMAT
+  note_font_size 42
+  xpos -584
+  ypos -2238
+  bdwidth 1129
+  bdheight 317
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x388e8e00
+  label "BURNIN - TEXT"
+  note_font_size 42
+  xpos 268
+  ypos -1048
+  bdwidth 900
+  bdheight 749
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0x71c67100
+  label "DEFAULT SLATE\n"
+  note_font_size 42
+  xpos -690
+  ypos -755
+  bdwidth 420
+  bdheight 456
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode6
+  tile_color 0xaaaaaa00
+  label OUTPUT
+  note_font_size 42
+  xpos -52
+  ypos -11
+  bdwidth 740
+  bdheight 536
+ }
+ ColorWheel {
+  inputs 0
+  gamma 0.45
+  rotate 137
+  name ColorWheel2
+  xpos -360
+  ypos -681
+ }
+ Reformat {
+  type "to box"
+  box_width 300
+  name Reformat1
+  xpos -360
+  ypos -571
+ }
+ Transform {
+  translate {100 100}
+  name Transform
+  xpos -360
+  ypos -491
+ }
+ Constant {
+  inputs 0
+  name slate_base
+  xpos -680
+  ypos -675
+ }
+ Text {
+  message "Project: MDS Dev\nAsset: otherside_char\nIteration: 15\nTask: Model\nFrames: 1 - 10\nDate: 23 May 2018\nUser: chetan patel\n"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size 60
+  leading 0.3
+  yjustify center
+  Transform 1
+  box {300 {"(\[value root.height]/2)-500"} 1800 1389}
+  name slate_info
+  xpos -680
+  ypos -491
+ }
+ Merge {
+  inputs 2
+  name slate_merge
+  xpos -520
+  ypos -331
+ }
+ Dot {
+  name Dot4
+  xpos -488
+  ypos -166
+ }
+ ColorWheel {
+  inputs 0
+  gamma 0.45
+  rotate 137
+  name ColorWheel1
+  xpos -137
+  ypos -410
+ }
+ Reformat {
+  type "to box"
+  box_width {{bottom_left_text.width}}
+  box_height {{bottom_left_text.height}}
+  box_fixed true
+  resize fit
+  name Reformat5
+  xpos -137
+  ypos -316
+ }
+ Transform {
+  translate {{"- center.x"} 0}
+  scale 0.07
+  center {{"bottom_left_text.width/2 - bottom_left_text.height/2" x1 0} {bottom_left_text.height x1 0}}
+  name Transform2
+  xpos -137
+  ypos -272
+ }
+ Transform {
+  translate {{burnInCtrl.bleed/2} {"- burnInCtrl.bleed/2"}}
+  center {1024 778}
+  name Transform1
+  xpos -137
+  ypos -246
+ }
+set N3d551880 [stack 0]
+ Transform {
+  center {1024 778}
+  name Transform4
+  xpos -137
+  ypos -220
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos 285
+  ypos -3046
+ }
+ Dot {
+  name Dot6
+  xpos 318
+  ypos -2801
+ }
+set N3d550e00 [stack 0]
+ Colorspace {
+  colorspace_out HSV
+  name HSV
+  xpos 443
+  ypos -2646
+ }
+push $N3d550e00
+ Colorspace {
+  colorspace_out Cineon
+  name Cineon
+  xpos 283
+  ypos -2726
+ }
+ Gamma {
+  value 0.454
+  name Gamma1
+  xpos 283
+  ypos -2644
+ }
+push $N3d550e00
+ Colorspace {
+  name sRGB
+  xpos 123
+  ypos -2646
+ }
+ Switch {
+  inputs 3
+  which {{parent.colourspace}}
+  name lutSwitch
+  xpos 283
+  ypos -2486
+ }
+ Remove {
+  channels alpha
+  name Remove1
+  xpos 286
+  ypos -2334
+ }
+ Dot {
+  name Dot7
+  xpos 319
+  ypos -2150
+ }
+set N3c11f500 [stack 0]
+ Reformat {
+  format "1920 1080 0 0 1920 1080 1 HD_1080"
+  name Reformat2
+  tile_color 0xffa800ff
+  xpos 444
+  ypos -2006
+ }
+ set C3c11f180 [stack 0]
+set N3c11f180 [stack 0]
+ Dot {
+  name Dot12
+  xpos 477
+  ypos -1764
+ }
+push $N3c11f180
+push $N3c11f500
+ Reformat {
+  format "2048 1080 0 0 2048 1080 1 2K_DCP"
+  name Reformat4
+  tile_color 0xff00b7ff
+  xpos 124
+  ypos -2006
+ }
+ set C3c11ea80 [stack 0]
+set N3c11ea80 [stack 0]
+push $N3c11ea80
+ Dot {
+  name Dot9
+  xpos 156
+  ypos -1764
+ }
+ Switch {
+  inputs 4
+  which {{ShotgunQuickDaily2.Switch1.which}}
+  name HD_2K_switcher
+  xpos 282
+  ypos -1688
+ }
+ set C3c11e380 [stack 0]
+set N3c11e380 [stack 0]
+ Dot {
+  name Dot3
+  xpos 477
+  ypos -1681
+ }
+ Dot {
+  name Dot2
+  xpos 477
+  ypos -1281
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  name Constant1
+  xpos -360
+  ypos -2349
+ }
+ Dot {
+  name Dot10
+  xpos -327
+  ypos -2160
+ }
+set N3e28f500 [stack 0]
+clone $C3c11f180 {
+  xpos -197
+  ypos -2002
+  selected false
+ }
+set N3e28f180 [stack 0]
+ Dot {
+  name Dot8
+  xpos -164
+  ypos -1760
+ }
+push $N3e28f180
+push $N3e28f500
+clone $C3c11ea80 {
+  xpos -517
+  ypos -2003
+  selected false
+ }
+set N3e28ea80 [stack 0]
+push $N3e28ea80
+ Dot {
+  name Dot5
+  xpos -484
+  ypos -1760
+ }
+clone $C3c11e380 {
+  inputs 4
+  xpos -359
+  ypos -1685
+  selected false
+ }
+ FormatCrop {
+  name LINE
+  label "\[value presets]"
+  xpos -358
+  ypos -1530
+  multiply {1 1 0 0}
+  value 1
+ }
+ Dot {
+  name Dot1
+  xpos -326
+  ypos -1361
+ }
+push $N3c11e380
+push $N3c11e380
+ FormatCrop {
+  name BAR1
+  label "\[value presets]"
+  xpos 123
+  ypos -1614
+  outputview solid
+  multiply {0 0 0 0}
+  value 1
+ }
+push $N3c11e380
+ Blur {
+  inputs 1+1
+  size 18
+  filter quadratic
+  name Blur1
+  xpos 121
+  ypos -1534
+ }
+ Switch {
+  inputs 2
+  which {{parent.gateBlur}}
+  name Switch4
+  xpos 282
+  ypos -1528
+ }
+ FormatCrop {
+  name BAR
+  label "\[value presets]"
+  xpos 281
+  ypos -1456
+  outputview solid
+  multiply {0 0 0 0}
+ }
+ Merge2 {
+  inputs 2
+  operation conjoint-over
+  name Merge1
+  xpos 281
+  ypos -1368
+ }
+ Switch {
+  inputs 2
+  which {{parent.burninOption}}
+  name switch
+  xpos 281
+  ypos -1286
+  cached true
+ }
+ Text {
+  message "Asset: ???\nTask: ???"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  yjustify top
+  Transform 1
+  box {{"burnInCtrl.bleed + (Transform2.scale * Reformat5.width/2)" x1 20} {"\[value root.height]/2" x1 228} {"\[value root.width]/2" x1 1024} {"\[value root.height] -burnInCtrl.bleed" x1 1536}}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name top_left_text
+  tile_color 0xff0000ff
+  gl_color 0xff0000ff
+  xpos 278
+  ypos -968
+ }
+ Text {
+  message Project
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{"burnInCtrl.fontsize *2"}}
+  xjustify center
+  yjustify top
+  Transform 1
+  box {0 {"\[value root.width]/2"} {"\[value root.width]"} {"\[value root.height] -burnInCtrl.bleed"}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name top_center_text
+  tile_color 0xffa3ff
+  gl_color 0xffa3ff
+  xpos 598
+  ypos -968
+ }
+ Text {
+  message "artist\ndate\n"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify right
+  yjustify top
+  Transform 1
+  box {{"\[value root.width] - burnInCtrl.bleed"} {"\[value root.height]/2"} {"\[value root.width]/2"} {"\[value root.height] -burnInCtrl.bleed"}}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name top_right_text
+  tile_color 0xff3fff
+  gl_color 0xff3fff
+  xpos 918
+  ypos -968
+ }
+ Text {
+  message "\[format %04d \[frame]]\nFrames: start - end"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify right
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/2"} {burnInCtrl.bleed} {"\[value width] - burnInCtrl.bleed"} {"\[value root.height]/2"}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_right_text
+  tile_color 0xaa55ffff
+  gl_color 0xaa55ffff
+  xpos 918
+  ypos -811
+ }
+set Nd5a8e00 [stack 0]
+ Text {
+  message "\n\nHSV"
+  font C:/Windows/Fonts/arial.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify center
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/4" x50 320} {burnInCtrl.bleed x50 20} {"(\[value root.width])/2+((\[value root.width])/4)" x50 1260} {"\[value root.height]/5" x50 252}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_lower_text_animSpline
+  tile_color 0x20ff00ff
+  gl_color 0x20ff00ff
+  xpos 1079
+  ypos -651
+  disable true
+ }
+push $Nd5a8e00
+ Text {
+  message "\n\nCineon"
+  font C:/Windows/Fonts/arial.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify center
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/4" x50 320} {burnInCtrl.bleed x50 20} {"(\[value root.width])/2+((\[value root.width])/4)" x50 1260} {"\[value root.height]/5" x50 252}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_lower_text_animBlock
+  tile_color 0x20ff00ff
+  gl_color 0x20ff00ff
+  xpos 918
+  ypos -694
+ }
+push $Nd5a8e00
+ Text {
+  message "\n\ncolorspace"
+  font C:/Windows/Fonts/arial.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify center
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/4" x50 320} {burnInCtrl.bleed x50 20} {"(\[value root.width])/2+((\[value root.width])/4)" x50 1260} {"\[value root.height]/5" x50 252}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_lower_text_animNone
+  tile_color 0x20ff00ff
+  gl_color 0x20ff00ff
+  xpos 758
+  ypos -650
+ }
+ Switch {
+  inputs 3
+  which {{parent.colourspace}}
+  name SwitchColourNote
+  xpos 918
+  ypos -491
+ }
+set Nd5a8000 [stack 0]
+ Text {
+  message "\[value parent.format] (RRT Enabled)\n"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify center
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/4" x50 320} {burnInCtrl.bleed x50 20} {"(\[value root.width])/2+((\[value root.width])/4)" x50 1260} {"\[value root.height]/5" x50 252}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_center_text_on
+  tile_color 0xff000dff
+  gl_color 0xff000dff
+  xpos 598
+  ypos -491
+ }
+push $Nd5a8000
+ Text {
+  message "\[value parent.format]\n"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  xjustify center
+  yjustify bottom
+  Transform 1
+  box {{"\[value root.width]/4" x50 320} {burnInCtrl.bleed x50 20} {"(\[value root.width])/2+((\[value root.width])/4)" x50 1260} {"\[value root.height]/5" x50 252}}
+  center {640 360}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_center_text_off
+  tile_color 0xff000dff
+  gl_color 0xff000dff
+  xpos 918
+  ypos -331
+ }
+ Switch {
+  inputs 2
+  which {{parent.LUTon}}
+  name Switch2
+  xpos 598
+  ypos -331
+ }
+ Text {
+  message "\[file rootname \[file tail \[value root.name]]]\nQuickdaily No: ??"
+  font //productions/boad/Pipeline/development/otherside_dev/install/app_store/tk-nuke-quickdailies/v0.3.3mds/resources/liberationsans_regular.ttf
+  size {{burnInCtrl.fontsize}}
+  leading 0.15
+  yjustify bottom
+  Transform 1
+  box {{burnInCtrl.bleed} {burnInCtrl.bleed} {"\[value root.width]/2"} {"\[value root.height]/2"}}
+  color {{parent.font_colour.r} {parent.font_colour.g} {parent.font_colour.b} {parent.font_colour.a}}
+  name bottom_left_text
+  tile_color 0xffbf00ff
+  gl_color 0xffbf00ff
+  xpos 278
+  ypos -331
+ }
+set N1e89b180 [stack 0]
+ Merge2 {
+  inputs 2
+  name Merge2
+  xpos 113
+  ypos -220
+ }
+push $N1e89b180
+ Switch {
+  inputs 2
+  which {{parent.burninOption}}
+  name switch1
+  xpos 389
+  ypos -232
+  cached true
+ }
+ Dot {
+  name Dot11
+  xpos 312
+  ypos -172
+ }
+set N1e89a700 [stack 0]
+ Reformat {
+  type "to box"
+  box_width 240
+  box_height 170
+  box_fixed true
+  resize fit
+  black_outside true
+  name Reformat3
+  tile_color 0x808080ff
+  xpos 598
+  ypos 69
+ }
+ Write {
+  file d:/users/chetan~1.pat/appdata/local/temp/tmp3xcysn/thumb_seq.%08d.png
+  file_type png
+  checkHashOnRead false
+  version 3
+  in_colorspace linear
+  out_colorspace linear
+  name png_writer
+  xpos 598
+  ypos 445
+  disable true
+  postage_stamp true
+ }
+push $N1e89a700
+ Reformat {
+  type "to box"
+  box_width 1920
+  box_height 1080
+  box_fixed true
+  black_outside true
+  name mov_1080
+  tile_color 0xad75ffff
+  xpos 438
+  ypos 69
+ }
+push $N1e89a700
+ Reformat {
+  type "to box"
+  box_width 1280
+  box_height 720
+  box_fixed true
+  black_outside true
+  name mov_720
+  tile_color 0xad75ffff
+  xpos 278
+  ypos 69
+ }
+push $N1e89a700
+ Reformat {
+  type "to box"
+  box_width 2048
+  box_height 1080
+  box_fixed true
+  black_outside true
+  name mov_2k
+  tile_color 0x77ff75ff
+  xpos 118
+  ypos 69
+ }
+push $N1e89a700
+ Reformat {
+  type "to box"
+  box_width 1024
+  box_height 540
+  box_fixed true
+  black_outside true
+  name mov_half2k
+  tile_color 0x77ff75ff
+  xpos -42
+  ypos 69
+ }
+ Switch {
+  inputs 4
+  which {{parent.format}}
+  name Switch1
+  xpos 278
+  ypos 229
+ }
+ Remove {
+  channels alpha
+  name Remove2
+  xpos 278
+  ypos 311
+ }
+ Write {
+  file //productions/boad/Projects/development/mds_dev/assets/character/otherside_char/model/review/quickdaily/otherside_char_model_quickdaily_v015.mov
+  file_type mov
+  meta_codec avc1
+  meta_encoder mov32
+  mov32_codec avc1
+  mov32_fps 23.97999573
+  mov32_settings 0000000000000000000000000000019a7365616e0000000100000001000000000000018676696465000000010000000e00000000000000227370746c00000001000000000000000061766331000000000018000003ff000000207470726c000000010000000000000000000003ff0017fae100000001000000246472617400000001000000000000000000000000000000530000010000000100000000156d70736f00000001000000000000000000000000186d66726100000001000000000000000000000000000000187073667200000001000000000000000000000000000000156266726100000001000000000000000001000000166d70657300000001000000000000000001000000002868617264000000010000000000000000000000000000000000000000000000000000000000000016656e647300000001000000000000000000000000001663666c67000000010000000000000000004400000018636d66720000000100000000000000006170706c00000014636c75740000000100000000000000000000001c766572730000000100000000000000000003001c00010000
+  mov32_advanced 1
+  mov32_pixel_format {{0} "default (YCbCr  8-bit 422 (2vuy))" "RGBA  8-bit" "YCbCr  8-bit 422 (2vuy)"}
+  mov64_codec AVdn
+  mov64_dnxhd_codec_profile "DNxHD 422 8-bit 36Mbit"
+  mov64_advanced 1
+  mov64_bitrate 20000
+  mov64_bitrate_tolerance 40000000
+  mov64_quality_min 2
+  mov64_quality_max 31
+  mov64_gop_size 12
+  mov64_b_frames 0
+  checkHashOnRead false
+  version 3
+  name mov_writer
+  xpos 278
+  ypos 445
+  disable true
+  postage_stamp true
+ }
+ Output {
+  name Output1
+  xpos 280
+  ypos 709
+ }
+ Transform {
+  inputs 0
+  center {1024 778}
+  name Transform3
+  xpos 146
+  ypos -955
+ }
+push $N3d551880
+ Viewer {
+  frame_range 1-1
+  viewerProcess None
+  name Viewer1
+  xpos -200
+  ypos -11
+ }
+ NoOp {
+  inputs 0
+  name burnInCtrl
+  tile_color 0xff5f00ff
+  gl_color 0xff5f00ff
+  xpos 598
+  ypos -651
+  addUserKnob {20 User}
+  addUserKnob {7 fontsize l "Font Size" R 0 100}
+  fontsize {{"(\[value height]  - this.bleed*2 ) *0.027"}}
+  addUserKnob {7 bleed l Bleed R 5 50}
+  bleed 20
+ }
+end_group
