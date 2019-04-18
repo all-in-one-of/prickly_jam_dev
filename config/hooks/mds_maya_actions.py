@@ -72,7 +72,13 @@ class MayaActions(HookBaseClass):
                                       "params": None,
                                       "caption": "Create Reference", 
                                       "description": "This will add the item to the scene as a standard reference."} )
-        
+   
+        if "reference_custom_namespace" in actions:
+            action_instances.append( {"name": "reference_custom_namespace", 
+                                      "params": None,
+                                      "caption": "Create Reference Custom Namespace", 
+                                      "description": "This will add the item to the scene as a standard reference with a custom namespace."} )
+
         if "import_geo_cache" in actions:
             action_instances.append( {"name": "import_geo_cache", 
                                       "params": None,
@@ -176,6 +182,9 @@ class MayaActions(HookBaseClass):
         if name == "reference":
             self._create_reference(path, sg_publish_data)
 
+        if name == "reference_custom_namespace":
+            self._create_reference_custom_ns(path, sg_publish_data)
+
         if name == "import":
             self._do_import(path, sg_publish_data)
         
@@ -204,6 +213,7 @@ class MayaActions(HookBaseClass):
     ##############################################################################################################
     # helper methods which can be subclassed in custom hooks to fine tune the behaviour of things
     
+
     def _create_reference(self, path, sg_publish_data):
         """
         Create a reference with the same settings Maya would use
@@ -219,54 +229,6 @@ class MayaActions(HookBaseClass):
         
         # make a name space out of entity name + publish name
         # e.g. bunny_upperbody
-
-# ================================
-# ================================
-# {   'code': 'testchar_maya_rig_v007.ma',
-#     'created_at': datetime.datetime(2019, 4, 15, 16, 10, 26, tzinfo=<tank_vendor.shotgun_api3.lib.sgtimezone.LocalTimezone object at 0x000001A07F6B8518>),
-#     'created_by': {   'id': 682, 'name': 'chetan patel', 'type': 'HumanUser'},
-#     'created_by.HumanUser.image': None,
-#     'description': None,
-#     'entity': {   'id': 2243, 'name': 'testchar', 'type': 'Asset'},
-#     'id': 21100,
-#     'image': 'https://sg-media-usor-01.s3-accelerate.amazonaws.com/fa640a4ef8c6d6571eccd675d13eaf46529e7738/fc5118e79db0d3e571fad5ac3fb68d155f3440b0/RackMultipart20190415-20975-5pfs7l_t.jpg?response-content-disposition=filename%3D%22RackMultipart20190415-20975-5pfs7l_t.jpg%22&x-amz-meta-user-id=682&x-amz-meta-user-type=HumanUser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAI3ABMYXRXQDDDLYQ%2F20190415%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20190415T045345Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=882a0343674655b3526f739d9be1136cb75420383b5684f7dd93bae4d9448586',
-#     'name': 'testchar_maya_rig',
-#     'path': {   'content_type': None,
-#                 'id': 160188,
-#                 'link_type': 'local',
-#                 'local_path': '\\\\productions\\boad\\Projects\\prickly_jam_dev\\assets\\character\\testchar\\maya_rig_scene\\v007\\testchar_maya_rig_v007.ma',
-#                 'local_path_linux': None,
-#                 'local_path_mac': '/Volumes/boad/Projects/prickly_jam_dev/assets/character/testchar/maya_rig_scene/v007/testchar_maya_rig_v007.ma',
-#                 'local_path_windows': '\\\\productions\\boad\\Projects\\prickly_jam_dev\\assets\\character\\testchar\\maya_rig_scene\\v007\\testchar_maya_rig_v007.ma',
-#                 'local_storage': {   'id': 4,
-#                                      'name': 'primary',
-#                                      'type': 'LocalStorage'},
-#                 'name': 'testchar_maya_rig_v007.ma',
-#                 'type': 'Attachment',
-#                 'url': 'file://\\\\productions\\boad\\Projects\\prickly_jam_dev\\assets\\character\\testchar\\maya_rig_scene\\v007\\testchar_maya_rig_v007.ma'},
-#     'project': {   'id': 280, 'name': 'Prickly Jam Dev', 'type': 'Project'},
-#     'published_file_type': {   'id': 118,
-#                                'name': 'Maya Rig',
-#                                'type': 'PublishedFileType'},
-#     'sg_status_list': 'wtg',
-#     'task': {   'id': 20419, 'name': 'Rig', 'type': 'Task'},
-#     'task.Task.content': 'Rig',
-#     'task.Task.due_date': None,
-#     'task.Task.sg_status_list': 'wtg',
-#     'task_uniqueness': False,
-#     'type': 'PublishedFile',
-#     'version': None,
-#     'version.Version.sg_status_list': None,
-#     'version_number': 7}
-# ================================
-# ================================
-
-        import pprint 
-        print '================================'
-        print '================================'
-        print pprint.pformat(sg_publish_data, indent=4)
-        print '================================'
-        print '================================'
 
         namespace = ':'
 
@@ -291,6 +253,42 @@ class MayaActions(HookBaseClass):
                                   mergeNamespacesOnClash=True, 
                                   namespace=namespace,
                                   sharedNodes="renderLayersByName")
+
+    def _create_reference_custom_ns(self, path, sg_publish_data):
+        """
+        Create a reference with the same settings Maya would use
+        if you used the create settings dialog.
+        
+        :param path: Path to file.
+        :param sg_publish_data: Shotgun data dictionary with all the standard publish fields.
+        """
+
+        if not os.path.exists(path):
+            raise Exception("File not found on disk - '%s'" % path)
+
+        
+        # make a name space out of entity name + publish name
+        # e.g. bunny_upperbody
+
+        namespace = ':'
+
+        result = cmds.promptDialog(
+                        title='Custom Namespace',
+                        message='Enter Namespace:',
+                        button=['OK', 'Cancel'],
+                        defaultButton='OK',
+                        cancelButton='Cancel',
+                        dismissString='Cancel')
+
+        if result == 'OK':
+            namespace = cmds.promptDialog(query=True, text=True)
+
+        pm.system.createReference(path, 
+                                  loadReferenceDepth= "all", 
+                                  mergeNamespacesOnClash=True, 
+                                  namespace=namespace,
+                                  sharedNodes="renderLayersByName")
+
 
     def _create_reference_multi(self, path, sg_publish_data):
         """
@@ -460,15 +458,15 @@ class MayaActions(HookBaseClass):
                         if cmds.attributeQuery('mdsMetadata', n=n, exists=True):
                             surface_root = n
 
-                print '============'
-                print 'surface_root=%s' % surface_root
-                print '============'
+                    print '============'
+                    print 'surface_root=%s' % surface_root
+                    print '============'
 
-                if not surface_root is None and not alembic_root is None:
-                    cmds.select(cl=True)
-                    cmds.select(alembic_root)
-                    cmds.select(surface_root, add=True)
-                    blend_node = cmds.blendShape(origin='world', weight=(0,1))
+                    if not surface_root is None and not alembic_root is None:
+                        cmds.select(cl=True)
+                        cmds.select(alembic_root)
+                        cmds.select(surface_root, add=True)
+                        blend_node = cmds.blendShape(origin='world', weight=(0,1))
 
                 cmds.hide(alembic_root)
             else:

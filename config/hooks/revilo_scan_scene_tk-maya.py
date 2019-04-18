@@ -123,8 +123,6 @@ class ScanSceneHook(Hook):
                         
                         vray_disp_nodes = get_vray_displacement_nodes(geo)
 
-                        import pprint
-                        print pprint.pformat(vray_disp_nodes, indent=4)
                         items.append({"type": "maya_model", "name": geoName, 'vray_disp_nodes': vray_disp_nodes})
 
             if ctx.step['name'] == 'Surface':
@@ -137,19 +135,11 @@ class ScanSceneHook(Hook):
 
                         file_nodes = get_file_nodes(geo)
                         non_ref_file_nodes = []
-
-
-                        for i in cmds.ls(type='mesh'):
-                            shadingEngines = pm.listConnections(i, type='shadingEngine')
-                            usedTextureNodes = pm.listHistory(shadingEngines, type='file')
-                            print usedTextureNodes
     
                         for file_node in file_nodes:
                             if not cmds.referenceQuery(file_node['file_node'], inr=True):
                                 non_ref_file_nodes.append(file_node)
 
-                        import pprint
-                        print pprint.pformat(non_ref_file_nodes, indent=4)
                         items.append({"type": "maya_surface", "name": geoName, 'file_nodes': non_ref_file_nodes})
 
 
@@ -162,34 +152,6 @@ class ScanSceneHook(Hook):
                         
                         items.append({"type": "maya_rig", "name": geoName})
                 pass
-            # # If asset publish individual alembics 
-            # print '=============='
-            # print 'Asset level alembic'
-            # print '=============='
-            # for geo in cmds.ls(assemblies=True, long=True):
-            #     alembic_caches = {}
-            #     if cmds.ls(geo, dag=True, type="mesh"):
-
-            #         # Geo found - does it have a tag?
-            #         if cmds.attributeQuery('mdsMetadata', n=geo, exists=True):
-
-            #             # Tag found - Let's define a name for geo called <Asset/Shot>_<Step>
-            #             geoName = geo.strip("|")
-
-            #             # Evaluate shutterAngle attributes
-            #             subFrame = cmds.getAttr(geo + ".subframe")
-
-            #             if subFrame == 0:
-            #                 shutterAngle = 0.25
-            #             if subFrame == 1:
-            #                 shutterAngle = 0.2
-            #             if subFrame == 2:
-            #                 shutterAngle = 0.125
-
-            #             alembic_caches[geo] = {"selection" : geo, "shutterAngle": shutterAngle, 'group_name': geoName}
-            #             # include this group as a 'mesh_group', record the selection, the name and the shutterAngle
-            #             print 'Adding asset alembic'
-            #             items.append({"type": "alembic_cache", "name": geoName, 'caches': alembic_caches})
 
 
         # If shot publish a group of alembics    
@@ -229,28 +191,6 @@ class ScanSceneHook(Hook):
                 if alembic_caches is not None:
                     items.append({"is_shot": True, "type": "alembic_cache", "name": 'alembic_caches', 'caches': alembic_caches})
 
-        # Added by: Chet
-        # Date: 18/05/2018
-        # Project: otherside
-
-        # Added a secondary publish for geometry caches
-
-        # geo_caches = {}
-        # for geo in cmds.ls(assemblies=True, long=True):
-        #     # Geo found - does it have a tag?
-        #     if cmds.attributeQuery('mdsMetadata', n=geo, exists=True):
-        #         meshes = cmds.listRelatives(geo, ad=True, type='mesh', pa=True)
-        #         visible_meshes = []
-        #         for mesh in meshes:
-        #             if cmds.getAttr(cmds.listRelatives(mesh, p=True)[0] + '.visibility'):
-        #                 visible_meshes.append(mesh)
-        #         geo_caches[geo] = visible_meshes
-        
-        # items.append({'type': 'geometry_cache', 'name': 'geo_caches', 'caches': geo_caches})
-
-        # Tony - look for renders:      
-        # we'll use the engine to get the templates
-
         engine = tank.platform.current_engine()
 
         # get the current app
@@ -258,7 +198,6 @@ class ScanSceneHook(Hook):
 
         # look up the template for the work file in the configuration
         # will get the proper template based on context (Asset, Shot, etc)
-
 
         if 'Step' in work_template_fields:
 

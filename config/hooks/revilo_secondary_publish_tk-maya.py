@@ -130,22 +130,6 @@ class PublishHook(Hook):
                 except Exception, e:
                    errors.append("Publish failed - %s" % e)
 
-        # # Chet - Added geometry cache publishing
-        #     elif output["name"] == "geometry_cache":
-        #         try:
-        #            self.__publish_geometry_cache(
-        #                 item,
-        #                 output,
-        #                 work_template,
-        #                 primary_publish_path,
-        #                 sg_task,
-        #                 comment,
-        #                 thumbnail_path,
-        #                 progress_cb,
-        #             )
-        #         except Exception, e:
-        #            errors.append("Publish failed - %s" % e)
-
             # Revilo - Added camera alembic publishing
             elif output["name"] == "camera":
                 try:
@@ -206,7 +190,6 @@ class PublishHook(Hook):
                     )
                 except Exception, e:
                     errors.append("Publish failed - %s" % e)
-
 
             # Tony - Added Rendered images from maya
             elif output["name"] == "rendered_image":
@@ -294,7 +277,6 @@ class PublishHook(Hook):
         cmds.select(oldsel)
 
 
-
     def __publish_maya_surface(self, item, output, work_template, primary_publish_path,
                                         sg_task, comment, thumbnail_path, progress_cb):
 
@@ -302,13 +284,6 @@ class PublishHook(Hook):
         cmds.select(cl=True)
 
         progress_cb(10, "Determining publish details")
-        import pprint 
-        print '================================'
-        print '================================'
-        print pprint.pformat(output, indent=4)
-        print pprint.pformat(item, indent=4)
-        print '================================'
-        print '================================'
         
         tank_type = output["tank_type"]
         
@@ -336,24 +311,10 @@ class PublishHook(Hook):
         publish_folder = os.path.dirname(publish_path)
 
         self.parent.ensure_folder_exists(publish_folder)
-        
-
-
-        print '================================'
-        print '================================'
-        print pprint.pformat(fields, indent=4)
-        print pprint.pformat(item, indent=4)
-        print '================================'
-        print '================================'
-
-        
+                
         texture_template = self.parent.sgtk.templates['maya_surface_texture_publish_root']
         for file_node in item['file_nodes']:
-            print '***********************'
-            print '***********************'
-            print file_node
-            print '***********************'
-            print '***********************'
+
             for texture_path in file_node['texture_paths']:
                 texture_fname = texture_path.split('/')[-1]
 
@@ -370,23 +331,12 @@ class PublishHook(Hook):
 
                 shutil.copyfile(texture_path, texture_root.replace('\\', '/') + '/' + texture_fname)
 
-
             new_fileTextureName = texture_root + '/' + file_node['fileTextureName'].split('/')[-1]
             file_node['old_fileTextureName'] = file_node['fileTextureName']
             cmds.setAttr('%s.%s' % (file_node['file_node'], 'fileTextureName'), new_fileTextureName, type='string')
 
-            #copy 
-
-
-
-        # print '===========selecting================='
-        # oldsel = cmds.ls(sl=True)
-        # cmds.select(cl=True)
-
-        print 'selecting %s' % item['name']
         cmds.select(item['name'])
         
-
         # export selected
         try:
             cmds.file(publish_path, typ='mayaAscii', pr=True, es=True)
@@ -412,22 +362,12 @@ class PublishHook(Hook):
         for file_node in item['file_nodes']:
             cmds.setAttr('%s.%s' % (file_node['file_node'], 'fileTextureName'), file_node['old_fileTextureName'], type='string')
 
-        cmds.select(cl=True)
-        cmds.select(oldsel)
-
 
     def __publish_maya_model(self, item, output, work_template, primary_publish_path,
                                         sg_task, comment, thumbnail_path, progress_cb):
 
         progress_cb(10, "Determining publish details")
-        import pprint 
-        print '================================'
-        print '================================'
-        print pprint.pformat(output, indent=4)
-        print pprint.pformat(item, indent=4)
-        print '================================'
-        print '================================'
-        
+
         tank_type = output["tank_type"]
         
         # get the current scene path and extract fields from it
@@ -473,9 +413,6 @@ class PublishHook(Hook):
                         fields['channel'] = 'misc'
                         texture_root = texture_template.apply_fields(fields)
 
-                    print '((((((((((((((((('
-                    print 'texture_root=%s' % texture_root
-                    print '((((((((((((((((('
                     if not os.path.isdir(texture_root):
                         os.makedirs(texture_root)
 
@@ -547,12 +484,7 @@ class PublishHook(Hook):
         #
         progress_cb(10, "Determining publish details")
         import pprint 
-        print '================================'
-        print '================================'
-        print pprint.pformat(output, indent=4)
-        print pprint.pformat(item, indent=4)
-        print '================================'
-        print '================================'
+
         # Revilo - Add naming for use in alembic export
         tank_type = output["tank_type"]
         
@@ -576,8 +508,8 @@ class PublishHook(Hook):
             alembic_args = ["-renderableOnly",   # only renderable objects (visible and not templated)
                         "-writeFaceSets",    # write shading group set assignments (Maya 2015+)
                         "-uvWrite",          # write uv's (only the current uv set gets written)
-                        "-stripNamespaces",  # Revilo - Strip namespaces to ensure animation wrapping works
-                        "-worldSpace",       # Revilo - Worldspace export
+                        #"-stripNamespaces",  # Revilo - Strip namespaces to ensure animation wrapping works
+                        "-worldSpace"       # Revilo - Worldspace export
                         ]
             # find the animated frame range to use:
             start_frame, end_frame = self._find_scene_animation_range()
@@ -590,38 +522,6 @@ class PublishHook(Hook):
             publish_version = fields["version"]
             publish_name = data['group_name']
             group_name = data['group_name']
-
-# ==============
-# Shot level alembic
-# ==============
-# {'type': 'work_file', 'name': u'0010_anim_v013.ma'}
-# {'shutterAngle': 0.25, 'type': 'camera', 'name': u'shot_0010_cam1'}
-# {'type': 'alembic_cache', 'name': 'alembic_caches', 'caches': {u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group': {'selection': u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group', 'shutterAngle': 0.25, 'group_name': u'testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group'}}}
-# {'item': {'type': 'alembic_cache', 'name': 'alembic_caches', 'caches': {u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group': {'selection': u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group', 'shutterAngle': 0.25, 'group_name': u'testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group'}}}, 'output': {'publish_template': <Sgtk TemplatePath maya_shot_mesh_alembic_cache: sequences/{Sequence}/{Shot}/{Step}/publish/alembic/[{grp_name}].abc>, 'name': 'alembic_cache', 'tank_type': 'Alembic Cache'}}
-# ================================
-# ================================
-# {   'name': 'alembic_cache',
-#     'publish_template': <Sgtk TemplatePath maya_shot_mesh_alembic_cache: sequences/{Sequence}/{Shot}/{Step}/publish/alembic/[{grp_name}].abc>,
-#     'tank_type': 'Alembic Cache'}
-# {   'caches': {   u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group': {   'group_name': u'testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group',
-#                                                                                                                                                    'selection': u'|testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group|testchar_testchar_maya_rig:prickly_jam_dev_testchar_group',
-#                                                                                                                                                    'shutterAngle': 0.25}},
-#     'name': 'alembic_caches',
-#     'type': 'alembic_cache'}
-# ================================
-# ================================
-# publish path = \\productions\boad\Projects\prickly_jam_dev\sequences\test_sequence\0010\anim\publish\alembic\testchar_testchar_maya_rig_prickly_jam_dev_testchar_group.abc
-# AbcExport -j "-renderableOnly -writeFaceSets -uvWrite -stripNamespaces -worldSpace -fr 991 1020 -attr uuid -attr alembic -attr subframe -attr version -attr artist -attr notes -frs -0 -frs 0 -root testchar_testchar_maya_rig:prickly_jam_dev_testchar_rig_group -file //productions/boad/Projects/prickly_jam_dev/sequences/test_sequence/0010/anim/publish/alembic/testchar_testchar_maya_rig_prickly_jam_dev_testchar_group.abc"
-# 0010_anim_alembic_caches
-# {'comment': u'', 'version_number': 13, 'task': {'content': 'Anim', 'step': {'type': 'Step', 'id': 5, 'name': 'Anim'}, 'type': 'Task', 'id': 20487}, 'tk': <Sgtk Core v0.18.151@0x1a0470b5b38 Config \\productions\boad\Pipeline\development\prickly_jam_dev>, 'context': <Sgtk Context:   Project: {'type': 'Project', 'name': 'Prickly Jam Dev', 'id': 280}
-#   Entity: {'type': 'Shot', 'name': '0010', 'id': 4074}
-#   Step: {'type': 'Step', 'name': 'Anim', 'id': 5}
-#   Task: {'type': 'Task', 'name': 'Anim', 'id': 20487}
-#   User: {'name': 'chetan patel', 'firstname': 'chetan', 'lastname': 'patel', 'image': None, 'id': 682, 'login': 'chetan.patel', 'type': 'HumanUser', 'email': 'cchetanpatel@gmail.com'}
-#   Shotgun URL: https://mds.shotgunstudio.com/detail/Task/20487
-#   Additional Entities: []
-#   Source Entity: {'entity.Shot.sg_sequence': {'type': 'Sequence', 'id': 313, 'name': 'test_sequence'}, 'entity': {'type': 'Shot', 'id': 4074, 'name': '0010'}, 'content': 'Anim', 'step': {'type': 'Step', 'id': 5, 'name': 'Anim'}, 'task_assignees': [], 'type': 'Task', 'id': 20487}>, 'thumbnail_path': 'd:\\users\\james~1.cun\\appdata\\local\\temp\\tanktmpnco3z9.png', 'path': u'\\\\productions\\boad\\Projects\\prickly_jam_dev\\sequences\\test_sequence\\0010\\anim\\publish\\alembic', 'dependency_paths': [u'\\\\productions\\boad\\Projects\\prickly_jam_dev\\sequences\\test_sequence\\0010\\anim\\publish\\maya\\0010_anim_v013.ma'], 'published_file_type': 'Alembic Cache', 'name': u'0010_anim_alembic_caches'}
-
 
             namespace = geo.split('|')[1].split(':')[0]
             geo_root = geo.split('|')[-1].split(':')[-1]
@@ -944,38 +844,9 @@ class PublishHook(Hook):
             'version': version,
             'Seq':4
         }
-        print fields
+
         publish_name = item["name"]
         publish_path = render_template.apply_fields(fields)
-        print 'publish_path'
-        print publish_path
-
-
-        # print publish_name
-        # print 'nitems'
-        # print '***********************'
-        # print nitems
-        # for i in nitems:
-        #     count = 1
-        #     start = 0
-        #     end = 0
-        #     while count < len(i):
-        # # if count finds "V" in the name stop (version) is always part of the naming coventions.
-        #         if i[count] == "v":
-        #             try:
-        #                 int(i[count+1])
-        #                 end = count-1
-        #             except:
-        #                 pass
-        #         if i[count:count+tmpNum] == shotstep:
-        #             start = count+tmpNum+1
-        #         count+=1
-        #
-        #     if publish_name == i[start:end]:
-        #         print i
-        #         publish_path = i
-        #     else:
-        #         print i
 
         # register the publish:
         progress_cb(75, "Registering the publish")

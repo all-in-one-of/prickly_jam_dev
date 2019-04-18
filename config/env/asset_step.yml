@@ -530,11 +530,11 @@ engines:
           name: tk-multi-breakdown
       tk-multi-loader2:
         action_mappings:
-          Maya Scene: [reference, import]
-          Maya Surface: [reference, import]
-          Maya Model: [reference, import]
-          Maya Rig: [reference, import]
-          Alembic Cache: [reference, import]
+          Maya Scene: [reference, reference_custom_namespace, import]
+          Maya Surface: [reference, reference_custom_namespace, import]
+          Maya Model: [reference, reference_custom_namespace, import]
+          Maya Rig: [reference, reference_custom_namespace, import]
+          Alembic Cache: [reference, reference_custom_namespace, import]
           Camera: [reference, import]
           Rendered Image: [texture_node]
           Photoshop Image: [texture_node]
