@@ -288,7 +288,6 @@ paths:
         definition: '@shot_root/work/maya/images/v{version}/{maya.layer_name}/{Shot}_{Step}_{maya.layer_name}_v{version}.{SEQ}.exr'
         root_name: 'primary'
     maya_shot_rendered:
-        # definition: '@shot_root/publish/maya/v{version}/{maya.layer_name}/{Shot}_{Step}_{maya.layer_name}_v{version}.{SEQ}.exr'
         definition: '@shot_root/publish/renders/v{version}/{maya.layer_name}/{Shot}_{Step}_{maya.layer_name}_v{version}.{SEQ}.exr'
         root_name: 'primary'
     maya_shot_render_location:

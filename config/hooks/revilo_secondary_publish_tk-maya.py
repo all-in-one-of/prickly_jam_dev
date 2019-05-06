@@ -508,7 +508,7 @@ class PublishHook(Hook):
             alembic_args = ["-renderableOnly",   # only renderable objects (visible and not templated)
                         "-writeFaceSets",    # write shading group set assignments (Maya 2015+)
                         "-uvWrite",          # write uv's (only the current uv set gets written)
-                        #"-stripNamespaces",  # Revilo - Strip namespaces to ensure animation wrapping works
+                        "-stripNamespaces",  # Revilo - Strip namespaces to ensure animation wrapping works
                         "-worldSpace"       # Revilo - Worldspace export
                         ]
             # find the animated frame range to use:
@@ -720,135 +720,25 @@ class PublishHook(Hook):
          #
 
         progress_cb(10, "Determining publish details")
+
         app = self.parent
         engine = tank.platform.current_engine()
-        nitems=[]
-
+        
         # get the current scene path and extract fields from it
         # using the work template:
-        scene_name = cmds.file(query=True, sn=True)
-        scene_path = os.path.abspath(cmds.file(query=True, sn=True))
-        fields = work_template.get_fields(scene_path)
-        work_template = app.get_template("template_work")
-        work_template_fields = work_template.get_fields(scene_name)
-        publish_version = fields["version"]
-        tank_type = output["tank_type"]
-        version = work_template_fields["version"]
-        shotstep = fields["Step"]
-        shotn = fields["Shot"]
-        tmpNum = len(str(shotstep))
 
-        # Creating the path needed for copying
-        Temp_a = self.parent.sgtk.templates['shot_publish_area_maya']
-        toDirectory = Temp_a.apply_fields(fields).replace('\\','/')
+        src_folder = os.path.split(item['other_params']['src_path'])[0]
+        dst_folder = os.path.split(item['other_params']['dst_path'])[0]
 
-        Temp_a = self.parent.sgtk.templates['maya_shot_rendered_location']
-        toDirectoryC = Temp_a.apply_fields(fields).replace('\\','/')
-
-        Temp_b = self.parent.sgtk.templates['maya_shot_render_location']
-        fromDirectory = Temp_b.apply_fields(fields).replace('\\','/')
-
-
-        def getFiles(path):
-            d,m,f=[],[],[]
-            for (dirpath, dirnames, filenames) in walk(path):
-                f.extend(filenames)
-                d.append(dirpath)
-            del d[0]
-            for path in d:
-                f,g=[path],[]
-                for (dirpath, dirnames, filenames) in walk(path):
-                    g.extend(filenames)
-                f.append(g)
-                m.append(f)
-            return (m)
-        # Creating Empty files to syc to shotgun (this will save ALOT of time)
-        def createEXRs(fileList):
-            for folder in fileList:
-                path = folder[0].split("/")
-                path = toDirectory + "/" + path[-1] + "/" + path[0]
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                for item in folder:
-                    if isinstance(item, list):
-                        for z in item:
-                            z = path + "/" + z
-                            f= open(str(z),"w+")
-                            f.close()    
+        for i in os.listdir(src_folder):
+            self.parent.copy_file(os.path.join(src_folder,i), os.path.join(dst_folder,i), sg_task)
 
         
-        import time
-        progress_cb(30, str(toDirectory))
-        imagesPath = fromDirectory
-        fileList = getFiles(imagesPath)
-        createEXRs(fileList)
+        publish_path = item['other_params']['dst_path']
+        publish_name = item['name']
+        publish_version = item['version']
+        tank_type = item['type']
 
-        # scan the publish folder for the empty exr we just made to get ready to publish them onto shotgun
-        progress_cb(30, str(fromDirectory))
-
-        # determine the template for the publish path
-
-        # get all the secondary output render templates and match them against
-        # what is on disk
-        secondary_outputs = app.get_setting("secondary_outputs")
-        render_outputs = [out for out in secondary_outputs if out["tank_type"] == "Rendered Image"]
-        for render_output in render_outputs:
-
-            render_template = self.parent.sgtk.templates['maya_shot_rendered']
- 
-            # iterate over all layers
-            for layer in cmds.ls(type="renderLayer"):
-
-                    # apparently maya has 2 names for the default layer. I'm
-                    # guessing it actually renders out as 'masterLayer'.
-                    layer = layer.replace("defaultRenderLayer", "masterLayer")
-
-                    # these are the fields to populate into the template to match
-                    # against
-                    field = {
-                        'maya.layer_name': layer,
-                        'name': layer,
-                        'version': version,
-                        'Step': shotstep,
-                        'Shot': shotn,
-                    }
-
-                    # match the files we just moved against the render template
-                    npaths = engine.tank.abstract_paths_from_template(
-                        render_template, field)
-                    if npaths:
-                        nitems.append(npaths[0])
-                    
-
-        # setting the new published path of the renders in the publish directory
-
-        scene_name = cmds.file(q=True, sn=True)
-        fields = work_template.get_fields(scene_path)
-        work_template = app.get_template("template_work")
-        work_template_fields = work_template.get_fields(scene_name)
-        publish_version = fields["version"]
-
-        version = work_template_fields["version"]
-        shotstep = fields["Step"]
-        shotn = fields["Shot"]
-
-        #work_template = eng.get_template("template_work")
-        #work_template_fields = work_template.get_fields(scene_name)
-        render_template = self.parent.sgtk.templates["maya_shot_rendered"]
-
-        fields = {
-            'Shot': shotn,
-            'Step': shotstep,
-            'Sequence': work_template_fields["Sequence"],
-            'maya.layer_name': item['layer'],
-            'version': version,
-            'Seq':4
-        }
-
-        publish_name = item["name"]
-        publish_path = render_template.apply_fields(fields)
-
-        # register the publish:
         progress_cb(75, "Registering the publish")
         args = {
              "tk": self.parent.tank,
@@ -863,8 +753,134 @@ class PublishHook(Hook):
              "published_file_type": tank_type
         }
         tank.util.register_publish(**args)
+
+        # # Creating the path needed for copying
+        # Temp_a = self.parent.sgtk.templates['shot_publish_area_maya']
+        # toDirectory = Temp_a.apply_fields(fields).replace('\\','/')
+
+        # Temp_a = self.parent.sgtk.templates['maya_shot_rendered_location']
+        # toDirectoryC = Temp_a.apply_fields(fields).replace('\\','/')
+
+        # Temp_b = self.parent.sgtk.templates['maya_shot_render_location']
+        # fromDirectory = Temp_b.apply_fields(fields).replace('\\','/')
+
+
+        # def getFiles(path):
+        #     d,m,f=[],[],[]
+        #     for (dirpath, dirnames, filenames) in walk(path):
+        #         f.extend(filenames)
+        #         d.append(dirpath)
+        #     del d[0]
+        #     for path in d:
+        #         f,g=[path],[]
+        #         for (dirpath, dirnames, filenames) in walk(path):
+        #             g.extend(filenames)
+        #         f.append(g)
+        #         m.append(f)
+        #     return (m)
+        # # Creating Empty files to syc to shotgun (this will save ALOT of time)
+        # def createEXRs(fileList):
+        #     for folder in fileList:
+        #         path = folder[0].split("/")
+        #         path = toDirectory + "/" + path[-1] + "/" + path[0]
+        #         if not os.path.exists(path):
+        #             os.makedirs(path)
+        #         for item in folder:
+        #             if isinstance(item, list):
+        #                 for z in item:
+        #                     z = path + "/" + z
+        #                     f= open(str(z),"w+")
+        #                     f.close()    
+
+        
+        # import time
+        # progress_cb(30, str(toDirectory))
+        # imagesPath = fromDirectory
+        # fileList = getFiles(imagesPath)
+        # createEXRs(fileList)
+
+        # # scan the publish folder for the empty exr we just made to get ready to publish them onto shotgun
+        # progress_cb(30, str(fromDirectory))
+
+        # determine the template for the publish path
+
+        # get all the secondary output render templates and match them against
+        # what is on disk
+        # secondary_outputs = app.get_setting("secondary_outputs")
+        # render_outputs = [out for out in secondary_outputs if out["tank_type"] == "Rendered Image"]
+        # for render_output in render_outputs:
+
+        #     render_template = self.parent.sgtk.templates['maya_shot_rendered']
+ 
+        #     # iterate over all layers
+        #     for layer in cmds.ls(type="renderLayer"):
+
+        #             # apparently maya has 2 names for the default layer. I'm
+        #             # guessing it actually renders out as 'masterLayer'.
+        #             layer = layer.replace("defaultRenderLayer", "masterLayer")
+
+        #             # these are the fields to populate into the template to match
+        #             # against
+        #             field = {
+        #                 'maya.layer_name': layer,
+        #                 'name': layer,
+        #                 'version': version,
+        #                 'Step': shotstep,
+        #                 'Shot': shotn,
+        #             }
+
+        #             # match the files we just moved against the render template
+        #             npaths = engine.tank.abstract_paths_from_template(
+        #                 render_template, field)
+        #             if npaths:
+        #                 nitems.append(npaths[0])
+                    
+
+        # # setting the new published path of the renders in the publish directory
+
+        # scene_name = cmds.file(q=True, sn=True)
+        # fields = work_template.get_fields(scene_path)
+        # work_template = app.get_template("template_work")
+        # work_template_fields = work_template.get_fields(scene_name)
+        
+        # publish_version = fields["version"]
+        # version = work_template_fields["version"]
+        # shotstep = fields["Step"]
+        # shotn = fields["Shot"]
+
+        # #work_template = eng.get_template("template_work")
+        # #work_template_fields = work_template.get_fields(scene_name)
+        # render_template = self.parent.sgtk.templates["maya_shot_rendered"]
+
+        # fields = {
+        #     'Shot': shotn,
+        #     'Step': shotstep,
+        #     'Sequence': work_template_fields["Sequence"],
+        #     'maya.layer_name': item['layer'],
+        #     'version': version,
+        #     'Seq':4
+        # }
+
+        # publish_name = item["name"]
+        # publish_path = render_template.apply_fields(fields)
+
+        # register the publish:
+        # progress_cb(75, "Registering the publish")
+        # args = {
+        #      "tk": self.parent.tank,
+        #      "context": self.parent.context,
+        #      "comment": comment,
+        #      "path": publish_path,
+        #      "name": publish_name,
+        #      "version_number": publish_version,
+        #      "thumbnail_path": thumbnail_path,
+        #      "task": sg_task,
+        #      "dependency_paths": [primary_publish_path],
+        #      "published_file_type": tank_type
+        # }
+        # tank.util.register_publish(**args)
         #copy the actual files over to replace the empty exr we just made
-        copy_tree(fromDirectory, toDirectoryC)
+        # copy_tree(fromDirectory, toDirectoryC)
 
 
 

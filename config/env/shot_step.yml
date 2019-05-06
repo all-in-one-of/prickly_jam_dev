@@ -815,9 +815,9 @@ engines:
         hook_post_publish: default
         hook_primary_pre_publish: default
         hook_primary_publish: default
-        hook_scan_scene: default
-        hook_secondary_pre_publish: default
-        hook_secondary_publish: default
+        hook_scan_scene: mds_scan_scene_tk-nuke
+        hook_secondary_pre_publish: mds_secondary_pre_publish_tk-nuke
+        hook_secondary_publish: mds_secondary_publish_tk-nuke
         hook_thumbnail: default
         location:
           version: v0.10.11

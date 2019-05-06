@@ -213,7 +213,6 @@ class MayaActions(HookBaseClass):
     ##############################################################################################################
     # helper methods which can be subclassed in custom hooks to fine tune the behaviour of things
     
-
     def _create_reference(self, path, sg_publish_data):
         """
         Create a reference with the same settings Maya would use
@@ -403,7 +402,7 @@ class MayaActions(HookBaseClass):
 
                 # perform a more or less standard maya import, putting all nodes brought in into a specific namespace
                 try:
-                    namespace = ('_').join(cache.split('.')[0].split('_')[1:])
+                    namespace = ('_').join(cache.split('.')[0].split('_')[2:])
                 except Exception as e:
                     print e
                     namespace = ':'

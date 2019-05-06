@@ -131,7 +131,7 @@ class ScanSceneHook(Hook):
                     # Geo found - does it have a tag?
                     if cmds.attributeQuery('mdsMetadata', n=geo, exists=True):
                     # Tag found - Let's define a name for geo called <Asset/Shot>_<Step>
-                        geoName = geo.strip("|")
+                        geoName = geo.split("|")[1]
 
                         file_nodes = get_file_nodes(geo)
                         non_ref_file_nodes = []
@@ -227,26 +227,32 @@ class ScanSceneHook(Hook):
                                 'Step': work_template_fields['Step'],
                                 'maya.layer_name': layer,
                                 'version': version,
+                                'Sequence': work_template_fields['Sequence']
                             }
+
                             # match existing paths against the render template
                             paths = engine.tank.abstract_paths_from_template(
                                 render_template, fields)
+                            dst_paths = engine.tank.templates['maya_shot_rendered'].apply_fields(fields)
                             # if there's a match, add an item to the render 
                             if paths:
                                 items.append({
-                                    "type": "rendered_image",
+                                    "type": "Rendered Image",
                                     "layer": layer,
                                     "name": work_template_fields['Shot'] + '_' +
                                             work_template_fields['Step'] + '_' +
-                                            layer + '_v'  +
-                                            str(version).zfill(3),
+                                            #layer + '_v'  +
+                                            #str(version).zfill(3),
+                                            layer,
+                                     "version": version,
 
                                 # since we already know the path, pass it along for
                                 # publish hook to use
                                 "other_params": {
                                     # just adding first path here. may want to do some
                                     # additional validation if there are multiple.
-                                    'path': paths[0],
+                                    'src_path': paths[0],
+                                    'dst_path': dst_paths
                                 }
                             })
         for i in items:

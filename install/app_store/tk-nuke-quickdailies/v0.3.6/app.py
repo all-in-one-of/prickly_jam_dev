@@ -194,11 +194,26 @@ class NukeQuickDailies(tank.platform.Application):
         png_out["file"].setValue(png_path)
         
         # setup output quicktime path
-        mov_out = group_node.node("mov_writer")
+
+        n = nuke.root()
+        aces = False
+        if n['colorManagement'].value() == 'OCIO':
+            aces = True
+            print 'using OCIO'
+
+        if n['colorManagement'].value() == 'Nuke':
+            print 'using Nuke'
+
+        if aces:
+            mov_out = group_node.node("mov_writer_aces")
+        else:
+            mov_out = group_node.node("mov_writer")
         mov_path = mov_path.replace(os.sep, "/")
         mov_out["file"].setValue(mov_path)
         
         # MDS - Disabled codec settings. Defined in Gizmo now instead
+
+        # Set colorspace on output based on OCIO or Nuke colormanagement
 
         # apply the Write node codec settings we'll use for generating the Quicktime
         # self.execute_hook_method("codec_settings_hook",
