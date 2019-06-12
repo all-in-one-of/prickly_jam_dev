@@ -237,7 +237,7 @@ class ScanSceneHook(Hook):
                             # if there's a match, add an item to the render 
                             if paths:
                                 items.append({
-                                    "type": "Rendered Image",
+                                    "type": "rendered_image",
                                     "layer": layer,
                                     "name": work_template_fields['Shot'] + '_' +
                                             work_template_fields['Step'] + '_' +

@@ -486,36 +486,10 @@ engines:
           publish_group: false
           group_name: default
           tank_type: Geometry Cache
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         # Tony - Added code to Rendered images
         - description: Publish a rendered image sequence
           display_group: Renders
-          display_name: Rendered
+          display_name: Lighting Renders
           icon: icons/publish_nuke_writenode.png
           name: rendered_image
           publish_template: maya_shot_render
