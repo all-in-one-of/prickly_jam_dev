@@ -238,6 +238,7 @@ class ScanSceneHook(Hook):
                             if paths:
                                 items.append({
                                     "type": "rendered_image",
+                                    "tank_type": "Rendered Image",
                                     "layer": layer,
                                     "name": work_template_fields['Shot'] + '_' +
                                             work_template_fields['Step'] + '_' +

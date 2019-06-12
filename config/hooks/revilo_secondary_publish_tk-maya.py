@@ -537,7 +537,7 @@ class PublishHook(Hook):
             self.parent.ensure_folder_exists(publish_folder)
 
             # update fields with the group name:
-            
+
             if not publish_name:
                 publish_name = os.path.basename(publish_path)
             
@@ -737,7 +737,7 @@ class PublishHook(Hook):
         publish_path = item['other_params']['dst_path']
         publish_name = item['name']
         publish_version = item['version']
-        tank_type = item['type']
+        tank_type = item['tank_type']
 
         progress_cb(75, "Registering the publish")
         args = {
