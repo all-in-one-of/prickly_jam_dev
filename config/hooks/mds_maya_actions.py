@@ -388,7 +388,6 @@ class MayaActions(HookBaseClass):
         print '================================'
         print '================================'
 
-
         # make a name space out of entity name + publish name
         # e.g. bunny_upperbody                
         for cache in os.listdir(path):
@@ -402,7 +401,8 @@ class MayaActions(HookBaseClass):
 
                 # perform a more or less standard maya import, putting all nodes brought in into a specific namespace
                 try:
-                    namespace = ('_').join(cache.split('.')[0].split('_')[2:])
+                    namespace = ('_').join(cache.split('.')[0].split('_')[-2:])
+                    print namespace
                 except Exception as e:
                     print e
                     namespace = ':'
@@ -410,64 +410,78 @@ class MayaActions(HookBaseClass):
                 if namespace == '':
                     namespace = ':'
                 
+                print 'namespace = %s' % namespace
+
                 asset_name = namespace.split('_')[0]
 
-                eng = sgtk.platform.current_engine()
-                sg = eng.shotgun
-                project = eng.context.project
+                # eng = sgtk.platform.current_engine()
+                # sg = eng.shotgun
+                # project = eng.context.project
 
-                asset = sg.find_one('Asset', [['code', 'is', asset_name]] )
+                # try:
+                #     asset = sg.find_one('Asset', [['code', 'is', asset_name]] )
 
-                fields = ['id', 'version_number', 'code', 'path']
-                sorting = [{'column':'version_number','direction':'desc'}]
-                filters = [
-                            ['project', 'is', project],
-                            ['published_file_type', 'is', {'type': 'PublishedFileType', 'id': 117}],
-                            ['entity', 'is', asset]
-                            ]
+                #     fields = ['id', 'version_number', 'code', 'path']
+                #     sorting = [{'column':'version_number','direction':'desc'}]
+                #     filters = [
+                #                 ['project', 'is', project],
+                #                 ['published_file_type', 'is', {'type': 'PublishedFileType', 'id': 117}],
+                #                 ['entity', 'is', asset]
+                #                 ]
 
-                result = sg.find('PublishedFile', filters, fields)
+                #     result = sg.find('PublishedFile', filters, fields)
+                #     latest_surfacing = None
+                #     if result:
+                #         latest_surfacing = result[-1]
+                # except Exception as e:
+                #     print 'Could not find surfacing for asset:%s' % asset_name
+                #     print e
+                #     latest_surfacing = None
 
-                latest_surfacing = None
-                if result:
-                    latest_surfacing = result[-1]
+                # print '--------------'
+                # print latest_surfacing
+                # print '--------------'
 
-                nodes = cmds.file(os.path.join(path,cache), i=True, renameAll=True, namespace=namespace, loadReferenceDepth="all", preserveReferences=True, rnn=True)
+                try:
+                    nodes = cmds.file(os.path.join(path,cache), i=True, renameAll=True, namespace=namespace, loadReferenceDepth="all", preserveReferences=True, rnn=True)
+                except Exception as e:
+                    print e
+                    print 'Failed to load alebmic: %s' % os.path.join(path,cache)
 
-                print '============'
-                alembic_root = None
+                # print '============'
+                # alembic_root = None
 
-                trans = []
+                # trans = []
 
-                for n in nodes:
-                    if cmds.listRelatives(n, children=True, fullPath=True, type='mesh'):
-                        trans.append(n)
+                # for n in nodes:
+                #     if cmds.listRelatives(n, children=True, fullPath=True, type='mesh'):
+                #         trans.append(n)
 
-                alembic_root = ["|".join(n.split("|")[:2]) for n in trans]
-                alembic_root = list(set(alembic_root))
+                # alembic_root = ["|".join(n.split("|")[:2]) for n in trans]
+                # alembic_root = list(set(alembic_root))
                 
-                print '============'
-                print 'alembic_root=%s' % alembic_root
-                print '============'
+                # print '============'
+                # print 'alembic_root=%s' % alembic_root
+                # print '============'
 
-                namespace += '_surface'
-                if not latest_surfacing is None:
-                    nodes = cmds.file(os.path.join(path,latest_surfacing['path']['local_path'].replace('\\', '/')), i=True, renameAll=True, namespace=namespace, loadReferenceDepth="all", preserveReferences=True, rnn=True)
-                    for n in nodes:
-                        if cmds.attributeQuery('mdsMetadata', n=n, exists=True):
-                            surface_root = n
+                # namespace += '_surface'
+                # if not latest_surfacing is None:
+                #     nodes = cmds.file(os.path.join(path,latest_surfacing['path']['local_path'].replace('\\', '/')), i=True, renameAll=True, namespace=namespace, loadReferenceDepth="all", preserveReferences=True, rnn=True)
+                #     for n in nodes:
+                #         if cmds.attributeQuery('mdsMetadata', n=n, exists=True):
+                #             surface_root = n
 
-                    print '============'
-                    print 'surface_root=%s' % surface_root
-                    print '============'
+                #     print '============'
+                #     print 'surface_root=%s' % surface_root
+                #     print '============'
 
-                    if not surface_root is None and not alembic_root is None:
-                        cmds.select(cl=True)
-                        cmds.select(alembic_root)
-                        cmds.select(surface_root, add=True)
-                        blend_node = cmds.blendShape(origin='world', weight=(0,1))
+                #     if not surface_root is None and not alembic_root is None:
+                #         cmds.select(cl=True)
+                #         cmds.select(alembic_root)
+                #         cmds.select(surface_root, add=True)
+                #         blend_node = cmds.blendShape(origin='world', weight=(0,1))
 
-                cmds.hide(alembic_root)
+                # cmds.hide(alembic_root)
             else:
                 print 'Skipping\n\t%s\nAs it is alrady loaded.' % os.path.join(path,cache)
 
