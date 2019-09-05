@@ -33,7 +33,7 @@ maya_linux: maya
 #
 # Nuke
 #
-nuke_mac: /Applications/Nuke11.0v1/Nuke11.0v1.app
+nuke_mac: /Applications/Nuke11.2v5/Nuke11.2v5.app
 nuke_windows: 'C:\apps\nuke\11.2v4\Nuke11.2.exe'
 nuke_linux: Nuke11.3
 
@@ -41,8 +41,8 @@ nuke_linux: Nuke11.3
 #
 # Nuke Studio
 #
-nukestudio_mac: /Applications/Nuke11.0v1/NukeStudio11.0v1.app
-nukestudio_windows: 'C:\apps\nuke\11.2v4\Nuke11.2.exe'
+nukestudio_mac: /Applications/Nuke11.2v5/NukeStudio11.2v5.app
+nukestudio_windows: 'C:\Program Files\Nuke11.3v4\Nuke11.3.exe'
 nukestudio_linux: Nuke11.2
 
 
