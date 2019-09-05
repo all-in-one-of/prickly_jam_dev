@@ -680,7 +680,7 @@ class PublishHook(Hook):
 
         tank.util.register_publish(**args)
 
-    def _find_scene_animation_range(self):
+    def _find_scene_animation_range(self, is_cam=False):
         """
         Find the animation range from the current scene.
         """
@@ -689,7 +689,7 @@ class PublishHook(Hook):
 
         # if there aren't any animation curves then just return
         # a single frame:
-        if not animation_curves:
+        if not animation_curves and not is_cam:
             return (1, 1)
 
         # something in the scene is animated so return the
@@ -953,7 +953,7 @@ class PublishHook(Hook):
                         ]
 
         # find the animated frame range to use:
-        start_frame, end_frame = self._find_scene_animation_range()
+        start_frame, end_frame = self._find_scene_animation_range(is_cam=True)
         if start_frame and end_frame:
             alembic_args.append("-fr %d %d" % (start_frame, end_frame))
 
